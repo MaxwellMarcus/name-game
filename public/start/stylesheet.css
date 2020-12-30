@@ -1,0 +1,20 @@
+.button {
+  border: none;
+  display: block;
+  font-size: 40px;
+  font-family: sans-serif;
+  font-weight: bold;
+  background: lightgray;
+  border: 1px solid gray;
+  text-align: center;
+  padding: 20px;
+  text-decoration: none;
+  color: black;
+}
+
+.grid {
+  display: grid;
+  margin: 50px;
+  grid-row-gap: 100px;
+  grid-template-rows: 1fr 1fr;
+}

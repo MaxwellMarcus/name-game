@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <script src='/socket.io/socket.io.js'></script>
+  </head>
+  <body>
+    <link rel='stylesheet' href='stylesheet.css'></link>
+    <meta charset="utf-8">
+    <title>Name Game!</title>
+
+    <div class='grid' id='userform'>
+      <div>
+        <p style='font: 50px sans-serif'>Username: </p>
+        <input type="text" id='username' style='font-size: 50px; width: 100%'>
+      </div>
+      <div class='button' id='play'>Play</div>
+    </div>
+
+    <div class='grid' id='startMenu' style='display: none'>
+      <div class='button' id='add'>Add Names</div>
+      <div class='button'id='playGame'>Play</div>
+    </div>
+
+    <div class='grid' id='addMenu' style='display: none'>
+      <input type="text" id='name' style='font-size: 50px; width: 100%'>
+      <div class='button' id='submit'>Submit</div>
+      <!-- <div class='button' id='addPlay'>Play</div> -->
+      <div class='button' id='addBack'>Back</div>
+
+    </div>
+
+    <div class="grid" id='teamSelect' style='display: none'>
+      <div class="button" id='team1'>Team 1</div>
+      <div class="button" id='team2'>Team 2</div>
+      <div class='button' id='teamBack'>Back</div>
+    </div>
+
+    <div class="grid" id='waiting' style='display: none'>
+      <div class="button" id='switchTeam'>Change Team</div>
+    </div>
+
+    <div class="gameGrid" id='gameGrid' style='display: none'>
+      <div class="gridHeader">
+        <div class='text' id='up'>___ is up on team __</div>
+        <div class='text' id='timer'>Timer: 60</div>
+      </div>
+      <div class="gridBody">
+        <div class="text" id='notUp' style='display: none'>
+          <div class="text" id='teamScore'>Your Score:</div>
+          <div class="text" id='otherScore'>Other Score:</div>
+          <div class="text" id='currentScore'>Current Round:</div>
+          <div class="text" id='lastScore'>Last Round:</div>
+        </div>
+        <div class="text" id='upScreen' style='display: none'>
+          <div class='text' id='waitingStartTurn'>
+            <div class="button" id='startTurn'>Start</div>
+          </div>
+          <div class='text' id='playing' style='display: none'>
+            <div class='text' id='drawnName'>Name: </div>
+            <div class="text" id='warning' style='display: none; font-size: 20px'>Only one name left</div>
+            <div class='button' id='correct'>Correct</div>
+            <div class='button' id='pass'>Pass</div>
+            <div class="text" id='correctCounter'>Correct: </div>
+          </div>
+        </div>
+      </div>
+      <div class="gridFooter">
+        <div class='text' id='upNext'>__ is up next on team __</div>
+      </div>
+    </div>
+
+    <div class="grid" id='done' style='display: none'>
+      <div class="text" id='yourFinalScore'>Your Score: </div>
+      <div class="text" id='otherFinalScore'>Other Score: </div>
+    </div>
+
+    <script src='buttons.js'></script>
+  </body>
+</html>
