@@ -7,6 +7,8 @@ let correct = 0;
 let word;
 let start;
 let lastScore;
+let team;
+let teamNames
 
 document.querySelector('#createGame').onclick = e => {
   document.querySelector('#createJoin').style.display = 'none'
@@ -50,7 +52,10 @@ document.querySelector('#createButton').onclick = e => {
 
 }
 
-socket.on('gameCreated', () => {
+socket.on('gameCreated', (data) => {
+  gameData = data
+  teamNames = gameData.teamNames
+
   document.querySelector('#createGameScreen').style.display = 'none'
   document.querySelector('#userform').style.display = 'grid'
   document.querySelector('#gameCreateWarn').style.display = 'none'
@@ -65,7 +70,9 @@ document.querySelector('#joinGameButton').onclick = e => {
   socket.emit('joinGame', gameId)
 }
 
-socket.on('gameJoined', () => {
+socket.on('gameJoined', teams => {
+  teamNames = teams
+
   document.querySelector('#joinGameScreen').style.display = 'none'
   document.querySelector('#userform').style.display = 'grid'
   document.querySelector('#joinWarn').style.display = 'none'
@@ -112,17 +119,22 @@ document.querySelector('#playGame').onclick = e => {
   document.querySelector('#startMenu').style.display = 'none'
   document.querySelector('#teamSelect').style.display = 'grid'
 
+  document.querySelector('#team1').textContent = 'Team ' + teamNames[0]
+  document.querySelector('#team2').textContent = 'Team ' + teamNames[1]
+
   socket.emit('play')
 }
 
 document.querySelector('#team1').onclick = e => {
   socket.emit('team', 0)
+  team = 0
   document.querySelector('#waiting').style.display = 'grid'
   document.querySelector('#teamSelect').style.display = 'none'
 }
 
 document.querySelector('#team2').onclick = e => {
   socket.emit('team', 1)
+  team = 1
   document.querySelector('#waiting').style.display = 'grid'
   document.querySelector('#teamSelect').style.display = 'none'
 }
@@ -156,14 +168,14 @@ socket.on('starting', (data) => {
   }
 
   if (!up){
-    document.querySelector('#up').innerHTML = `${data.usernames[upId]} is up for team ${data.teamUp + 1}`
+    document.querySelector('#up').innerHTML = `${data.usernames[upId]} is up for team ${teamNames[data.teamUp]}`
     document.querySelector('#notUp').style.display = 'inline-block'
     document.querySelector('#upScreen').style.display = 'none'
 
     document.querySelector('#teamScore').textContent = 'Your Score: ' + data.scores[data.joinedTeam[socket.id]]
-    document.querySelector('#otherScore').textContent = 'Opponent Score: ' + data.scores[(data.joinedTeam[socket.id] + 1) % data.teams.length]
+    document.querySelector('#otherScore').textContent = 'Team' + teamNames[(team + 1) % teamNames.length] + ' Score: ' + data.scores[(data.joinedTeam[socket.id] + 1) % data.teams.length]
     document.querySelector('#currentScore').textContent = 'Current Round: 0'
-    if (data.lastCorrect){
+    if (data.lastCorrect != null){
       document.querySelector('#lastScore').textContent = 'Last Round: ' + data.lastCorrect
     }
   }else{
@@ -173,7 +185,7 @@ socket.on('starting', (data) => {
     document.querySelector('#waitingStartTurn').style.display = 'inline-block'
     document.querySelector('#playing').style.display = 'none'
   }
-  document.querySelector('#upNext').innerHTML = `${data.usernames[upNextId]} is up next for team ${((data.teamUp + 1) % data.teams.length) + 1}`
+  document.querySelector('#upNext').innerHTML = `${data.usernames[upNextId]} is up next for team ${teamNames[((data.teamUp + 1) % data.teams.length)]}`
 })
 
 document.querySelector('#startTurn').onclick = e => {

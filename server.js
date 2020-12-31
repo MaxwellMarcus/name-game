@@ -18,7 +18,7 @@ let joinedTeam = {}
 let teams = [[], []]
 let upIndexes = [0, 0]
 let scores = [0, 0]
-let teamNames = ['1', '2']
+let teamNames = ['blueberries', 'stawberries']
 let gameId = ''
 let sockets = []
 
@@ -76,7 +76,7 @@ io.sockets.on('connection', socket => {
   })
 
   socket.on('newGame', data => {
-    console.log('Starting new game with game code ' + gameData.gameId)
+    console.log('Starting new game with game code ' + data.gameId)
     if (!games[data.gameId]){
       gameData = data
       // [teams, usernames, upIndexes, names, scores, joinedTeam, lastCorrect] = gameData;
@@ -90,7 +90,7 @@ io.sockets.on('connection', socket => {
       sockets = gameData.sockets
       gameData.sockets.push(socket)
       games[gameData.gameId] = gameData
-      socket.emit('gameCreated')
+      socket.emit('gameCreated', gameData.teamNames)
     }else{
       socket.emit('gameCreationFailed')
       console.log('Game creation failed because a game has already been created with that id')
@@ -111,7 +111,7 @@ io.sockets.on('connection', socket => {
       lastCorrect = gameData.lastCorrect
       sockets = gameData.sockets
       sockets.push(socket)
-      socket.emit('gameJoined')
+      socket.emit('gameJoined', gameData.teamNames)
     }else{
       socket.emit('gameJoinFailed')
       console.log('Could not join game because there is no game with that id')
