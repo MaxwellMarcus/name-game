@@ -10,12 +10,14 @@
   padding: 20px;
   text-decoration: none;
   color: black;
+  /* width: 80% */
 }
 
 .grid {
   display: grid;
   margin: 50px;
   grid-row-gap: 100px;
+  /* width: 80% */
 }
 
 .text {
