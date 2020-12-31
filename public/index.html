@@ -8,12 +8,44 @@
     <meta charset="utf-8">
     <title>Name Game!</title>
 
-    <div class='grid' id='userform'>
+    <div class="grid" id='createJoin'>
+      <div class="button" id='createGame'>Create Game</div>
+      <div class="button" id='joinGame'>Join Game</div>
+    </div>
+
+    <div class="grid" id='createGameScreen' style='display: none'>
+      <div class="">
+        <p style='font: 50px sans-serif'>Game Code: </p>
+        <input type="text" id='gameCodeInput' style='font-size: 50px; width: 100%'>
+      </div>
+      <div class="">
+        <p style='font: 50px sans-serif'>Team 1 Name: </p>
+        <input type="text" id='team1Name' style='font-size: 50px; width: 100%'>
+      </div>
+      <div class="">
+        <p style='font: 50px sans-serif'>Team 2 Name: </p>
+        <input type="text" id='team2Name' style='font-size: 50px; width: 100%'>
+      </div>
+      <div class='button' id='createButton'>Create</div>
+      <div class='text' style='display: none' id='gameCreateWarn'>A game was not able to be created because there is already a game with that code</div>
+    </div>
+
+    <div class="grid" id='joinGameScreen' style='display: none'>
+      <div class="">
+        <p style='font: 50px sans-serif'>Game Code: </p>
+        <input type="text" id='joinGameInput' style='font-size: 50px; width: 100%'>
+      </div>
+      <div class='button' id='joinGameButton'>Join</div>
+      <div class='text' id='joinWarn' style='display: none'>The game was not able to be joined because no game exsists with that code</div>
+    </div>
+
+    <div class='grid' id='userform' style='display: none'>
       <div>
         <p style='font: 50px sans-serif'>Username: </p>
         <input type="text" id='username' style='font-size: 50px; width: 100%'>
       </div>
       <div class='button' id='play'>Play</div>
+      <div class='text' id='userWarn' style='display: none'>The game was not able to be joined because a user with that name already exsists</div>
     </div>
 
     <div class='grid' id='startMenu' style='display: none'>

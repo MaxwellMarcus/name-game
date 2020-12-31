@@ -11,19 +11,19 @@ var socket = require('socket.io');
 
 var io = socket(server);
 
-const names = ['alpaca', 'bunny']
+let names = ['alpaca', 'bunny']
+let clientNames = {}
+let usernames = {}
+let joinedTeam = {}
+let teams = [[], []]
+let upIndexes = [0, 0]
+let scores = [0, 0]
+let teamNames = ['1', '2']
+let gameId = ''
+let sockets = []
 
-const clientNames = {}
-
-const usernames = {}
-const joinedTeam = {}
-
-const teams = [[], []]
-const upIndexes = [0, 0]
-const scores = [0, 0]
-let currentCorrect = 0;
-
-let gameData = {
+let games = {}
+games[''] = {
   teams,
   usernames,
   teamUp: 0,
@@ -31,19 +31,33 @@ let gameData = {
   names,
   scores,
   joinedTeam,
+  teamNames,
+  gameId,
+  sockets,
   lastCorrect: null,
 }
+
 
 io.sockets.on('connection', socket => {
   console.log('New Connection: ' + socket.id)
 
-  clientNames[socket.id] = []
+  let gameData = {}
+  let teams = []
+  let usernames = []
+  let upIndexes = []
+  let names = []
+  let scores = []
+  let joinedTeam = []
+  let lastCorrect
+  let sockets = []
+  let currentCorrect
+  clientNames = []
 
   socket.on('add', name => {
     console.log('Adding: ' + name);
 
-    if (!clientNames[socket.id].includes(name)){
-      clientNames[socket.id].push(name);
+    if (!clientNames.includes(name)){
+      clientNames.push(name);
       names.push(name);
       console.log('Added')
     }
@@ -51,8 +65,57 @@ io.sockets.on('connection', socket => {
 
   socket.on('username', user => {
     console.log(user + ' logged in on client ' + socket.id)
-    console.log('Exsisting Users: ' + usernames)
-    usernames[socket.id] = user
+    if (!Object.values(usernames).includes(user)){
+      usernames[socket.id] = user
+      console.log(user + ' Successfully joined game ' + gameData.gameId + 'along with users: ' + Object.values(usernames))
+      socket.emit('usernameSuccess')
+    }else{
+      console.log(socket.id + ' was not able to join because a user with that name already exsists')
+      socket.emit('usernameFailure')
+    }
+  })
+
+  socket.on('newGame', data => {
+    console.log('Starting new game with game code ' + gameData.gameId)
+    if (!games[data.gameId]){
+      gameData = data
+      // [teams, usernames, upIndexes, names, scores, joinedTeam, lastCorrect] = gameData;
+      teams = gameData.teams
+      usernames = gameData.usernames
+      upIndexes = gameData.upIndexes
+      names = gameData.names
+      scores = gameData.scores
+      joinedTeam = gameData.joinedTeam
+      lastCorrect = gameData.lastCorrect
+      sockets = gameData.sockets
+      gameData.sockets.push(socket)
+      games[gameData.gameId] = gameData
+      socket.emit('gameCreated')
+    }else{
+      socket.emit('gameCreationFailed')
+      console.log('Game creation failed because a game has already been created with that id')
+    }
+  })
+
+  socket.on('joinGame', id => {
+    console.log('joining game with game code ' + id)
+    if (games[id]){
+      gameData = games[id]
+      // [teams, usernames, upIndexes, names, scores, joinedTeam, lastCorrect] = gameData;
+      teams = gameData.teams
+      usernames = gameData.usernames
+      upIndexes = gameData.upIndexes
+      names = gameData.names
+      scores = gameData.scores
+      joinedTeam = gameData.joinedTeam
+      lastCorrect = gameData.lastCorrect
+      sockets = gameData.sockets
+      sockets.push(socket)
+      socket.emit('gameJoined')
+    }else{
+      socket.emit('gameJoinFailed')
+      console.log('Could not join game because there is no game with that id')
+    }
   })
 
   // socket.on('play', () => {
@@ -82,7 +145,10 @@ io.sockets.on('connection', socket => {
 
     if (notready == 0){
       console.log('Starting!')
-      io.sockets.emit('starting', gameData)
+      const sockets = gameData.sockets
+      delete gameData.sockets
+      sockets.forEach(socket => socket.emit('starting', gameData))
+      gameData.sockets = sockets
     }else{
       console.log(notready + ' more players need to join to start the game')
     }
@@ -110,10 +176,11 @@ io.sockets.on('connection', socket => {
   })
 
   socket.on('timer', time => {
-    socket.broadcast.emit('timer', time)
+    sockets.forEach(socket => socket.emit('timer', time))
   })
 
   socket.on('endTurn', data => {
+    const sockets = gameData.sockets
     data.upIndexes[data.teamUp] = (data.upIndexes[data.teamUp] + 1) % data.teams[data.teamUp].length
     data.teamUp = (data.teamUp + 1) % data.teams.length
     data.lastCorrect = currentCorrect
@@ -123,7 +190,8 @@ io.sockets.on('connection', socket => {
     console.log('Scores are now ' + data.scores)
 
     gameData = JSON.parse(JSON.stringify(data))
-    io.sockets.emit('starting', gameData)
+    sockets.forEach(socket => socket.emit('starting', gameData))
+    gameData.sockets = sockets
   })
 
   socket.on('correct', correct => {
@@ -140,7 +208,7 @@ io.sockets.on('connection', socket => {
     console.log('Scores are now ' + data.scores)
 
     gameData = JSON.parse(JSON.stringify(data))
-    io.sockets.emit('done', gameData)
+    sockets.forEach(socket => socket.emit('done', gameData))
   })
 
 

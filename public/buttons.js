@@ -8,13 +8,88 @@ let word;
 let start;
 let lastScore;
 
+document.querySelector('#createGame').onclick = e => {
+  document.querySelector('#createJoin').style.display = 'none'
+  document.querySelector('#createGameScreen').style.display = 'grid'
+}
+
+document.querySelector('#joinGame').onclick = e => {
+  document.querySelector('#createJoin').style.display = 'none'
+  document.querySelector('#joinGameScreen').style.display = 'grid'
+}
+
+document.querySelector('#createButton').onclick = e => {
+
+  const names = []
+  const clientNames = {}
+  const usernames = {}
+  const joinedTeam = {}
+  const teams = [[], []]
+  const upIndexes = [0, 0]
+  const scores = [0, 0]
+  const teamNames = [document.querySelector('#team1Name').value, document.querySelector('#team2Name').value]
+  const gameId = document.querySelector('#gameCodeInput').value
+  const sockets = []
+  let currentCorrect = 0;
+
+  gameData = {
+    teams,
+    usernames,
+    teamUp: 0,
+    upIndexes,
+    names,
+    scores,
+    joinedTeam,
+    teamNames,
+    gameId,
+    sockets,
+    lastCorrect: null,
+  }
+
+  socket.emit('newGame', gameData)
+
+}
+
+socket.on('gameCreated', () => {
+  document.querySelector('#createGameScreen').style.display = 'none'
+  document.querySelector('#userform').style.display = 'grid'
+  document.querySelector('#gameCreateWarn').style.display = 'none'
+})
+
+socket.on('gameCreationFailed', ()=> {
+  document.querySelector('#gameCreateWarn').style.display = 'inline-block'
+})
+
+document.querySelector('#joinGameButton').onclick = e => {
+  const gameId = document.querySelector('#joinGameInput').value
+  socket.emit('joinGame', gameId)
+}
+
+socket.on('gameJoined', () => {
+  document.querySelector('#joinGameScreen').style.display = 'none'
+  document.querySelector('#userform').style.display = 'grid'
+  document.querySelector('#joinWarn').style.display = 'none'
+})
+
+socket.on('gameJoinFailed', () => {
+  document.querySelector('#joinWarn').style.display = 'inline-block'
+})
+
 document.querySelector('#play').onclick = e => {
   const name = document.querySelector('#username').value;
   socket.emit('username', name)
+}
+
+socket.on('usernameSuccess', () => {
   document.querySelector('#userform').style.display = 'none'
   document.querySelector('#startMenu').style.display = 'grid'
   document.querySelector('#addMenu').style.display = 'none'
-}
+  document.querySelector('#userWarn').style.display = 'none'
+})
+
+socket.on('usernameFailure', () => {
+  document.querySelector('#userWarn').style.display = 'inline-block'
+})
 
 document.querySelector('#add').onclick = e => {
   document.querySelector('#startMenu').style.display = 'none'
